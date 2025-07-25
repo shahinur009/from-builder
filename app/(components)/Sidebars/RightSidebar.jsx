@@ -1,10 +1,14 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { useForm } from "@/app/context/FormContext";
 import Input from "../Common/Input";
+import Button from "../Common/Button";
 
 const RightSidebar = () => {
-  const { selectedField, setSelectedField, updateField } = useForm();
+  const { selectedField, setSelectedField, updateField, setFormSchema } =
+    useForm();
+
   const [fieldProperties, setFieldProperties] = useState({});
   const [optionsInput, setOptionsInput] = useState("");
 
@@ -16,6 +20,9 @@ const RightSidebar = () => {
       } else {
         setOptionsInput("");
       }
+    } else {
+      setFieldProperties({});
+      setOptionsInput("");
     }
   }, [selectedField]);
 
@@ -33,10 +40,16 @@ const RightSidebar = () => {
     setFieldProperties((prev) => ({ ...prev, options: newOptions }));
   };
 
-  // Save changes when input loses focus
   const handleSave = () => {
     if (selectedField) {
-      updateField(selectedField.id, fieldProperties);
+      if (selectedField.id === "form-settings") {
+        setFormSchema((prevSchema) => ({
+          ...prevSchema,
+          name: fieldProperties.name,
+        }));
+      } else {
+        updateField(selectedField.id, fieldProperties);
+      }
     }
   };
 
@@ -64,7 +77,7 @@ const RightSidebar = () => {
           onBlur={handleSave}
         />
         <Input
-          label="Name"
+          label="Name (for submission)"
           id="name"
           name="name"
           type="text"
@@ -144,12 +157,12 @@ const RightSidebar = () => {
             ></textarea>
           </div>
         )}
-        <button
+        <Button
           onClick={() => setSelectedField(null)}
           className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 ease-in-out"
         >
           Close Settings
-        </button>
+        </Button>
       </div>
     </div>
   );

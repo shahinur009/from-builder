@@ -1,39 +1,52 @@
 "use client";
 
 import React from "react";
-import { useForm } from "@/app/context/FormContext";
-import { useFormCanvasDrop } from "@/app/hooks/useDragAndDrop";
 import FormField from "./FormField";
+import { useForm } from "@/app/context/FormContext";
+import { useDrop } from "react-dnd";
 
 const FormBuilder = () => {
-  const { formSchema, previewMode, addField } = useForm();
+  const { formSchema, addField, reorderFields } = useForm();
 
-  // Drop form canvas to new fields
-  const { drop, isOver, canDrop } = useFormCanvasDrop(addField);
+  const [{ isOver, canDrop }, drop] = useDrop(
+    () => ({
+      accept: "PALETTE_FIELD",
+      drop: (item, monitor) => {
+        addField({
+          id: `field-${Date.now()}`,
+          ...item.defaultProps,
+        });
+        return { name: "Form Canvas" };
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+        canDrop: monitor.canDrop(),
+      }),
+    }),
+    [addField]
+  );
 
   return (
     <div
-      ref={drop} // Drop target  canvas
-      className={`p-6 border rounded shadow-lg transition-all duration-200 ease-in-out ${
-        previewMode ? "bg-gray-50 cursor-not-allowed" : "bg-gray-50"
-      } ${
+      ref={drop}
+      className={`min-h-[500px] p-4 border-2 border-dashed rounded-lg transition-colors duration-200 ease-in-out ${
         isOver && canDrop
-          ? "border-dashed border-blue-500 bg-blue-100"
-          : "border-gray-300"
+          ? "border-purple-500 bg-purple-50"
+          : "border-gray-300 bg-white"
       }`}
     >
-      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-        {formSchema.name}
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        {formSchema.name || "Custom Form"}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {formSchema.fields.length > 0 ? (
+        {formSchema.fields.length === 0 ? (
+          <p className="text-center text-gray-500 col-span-full py-10">
+            Drag fields from the left sidebar here to build your form.
+          </p>
+        ) : (
           formSchema.fields.map((field, index) => (
             <FormField key={field.id} field={field} index={index} />
           ))
-        ) : (
-          <p className="col-span-full text-center text-gray-500 py-10">
-            Drag fields from the left sidebar to start building your form!
-          </p>
         )}
       </div>
     </div>

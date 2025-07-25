@@ -1,112 +1,75 @@
 "use client";
 
-import { usePaletteDrag } from "@/app/hooks/useDragAndDrop";
 import React from "react";
+import { usePaletteDrag } from "@/app/hooks/useDragAndDrop"; 
+
+const createNewField = (type, label) => {
+  const timestamp = Date.now();
+  let defaultProps = {
+    id: `${type}-${timestamp}`,
+    label: label,
+    name: `${type}${timestamp}`, 
+    columnWidth: "100%",
+    required: false,
+  };
+
+  switch (type) {
+    case "text":
+    case "email":
+    case "date":
+    case "time":
+      defaultProps.placeholder = `Enter ${label.toLowerCase()}`;
+      defaultProps.value = "";
+      break;
+    case "file":
+      defaultProps.label = "File Upload";
+      defaultProps.name = `fileUpload${timestamp}`;
+      delete defaultProps.placeholder; 
+      break;
+    case "select":
+      defaultProps.placeholder = "Select an option";
+      defaultProps.options = ["Option 1=option1", "Option 2=option2"];
+      defaultProps.value = "option1"; 
+      break;
+    case "checkbox":
+      defaultProps.options = ["Option 1=option1", "Option 2=option2"];
+      defaultProps.value = []; 
+      break;
+    case "radio":
+      defaultProps.options = ["Option 1=option1", "Option 2=option2"];
+      defaultProps.value = "option1"; 
+      break;
+    case "acceptance":
+      defaultProps.content =
+        "<p>I agree to the <strong>terms and conditions</strong>.</p>";
+      defaultProps.required = true;
+      delete defaultProps.placeholder;
+      defaultProps.value = false; 
+      break;
+    default:
+      defaultProps.value = ""; 
+      break;
+  }
+  return defaultProps;
+};
 
 const fieldTypes = [
-  {
-    type: "text",
-    label: "Text Input",
-    default: {
-      label: "New Text Field",
-      name: "new_text",
-      placeholder: "Enter text",
-      required: false,
-      columnWidth: "100%",
-    },
-  },
-  {
-    type: "email",
-    label: "Email Input",
-    default: {
-      label: "New Email Field",
-      name: "new_email",
-      placeholder: "Enter email",
-      required: false,
-      columnWidth: "100%",
-    },
-  },
-  {
-    type: "date",
-    label: "Date Input",
-    default: {
-      label: "New Date Field",
-      name: "new_date",
-      required: false,
-      columnWidth: "100%",
-    },
-  },
-  {
-    type: "time",
-    label: "Time Input",
-    default: {
-      label: "New Time Field",
-      name: "new_time",
-      required: false,
-      columnWidth: "100%",
-    },
-  },
-  {
-    type: "file",
-    label: "File Upload",
-    default: {
-      label: "New File Upload",
-      name: "new_file",
-      columnWidth: "100%",
-    },
-  },
-  {
-    type: "select",
-    label: "Select Dropdown",
-    default: {
-      label: "New Select Field",
-      name: "new_select",
-      placeholder: "Select an option",
-      required: false,
-      options: ["Option 1=option1", "Option 2=option2"],
-      columnWidth: "100%",
-    },
-  },
-  {
-    type: "checkbox",
-    label: "Checkbox Group",
-    default: {
-      label: "New Checkbox Field",
-      name: "new_checkbox",
-      required: false,
-      options: ["Option 1=option1", "Option 2=option2"],
-      columnWidth: "100%",
-    },
-  },
-  {
-    type: "radio",
-    label: "Radio Group",
-    default: {
-      label: "New Radio Field",
-      name: "new_radio",
-      required: false,
-      options: ["Option 1=option1", "Option 2=option2"],
-      columnWidth: "100%",
-    },
-  },
-  {
-    type: "acceptance",
-    label: "Acceptance",
-    default: {
-      label: "Acceptance",
-      name: "new_acceptance",
-      content: "<p>I agree to the <strong>terms and conditions</strong>.</p>",
-      required: true,
-      columnWidth: "100%",
-    },
-  },
+  { type: "text", label: "Text Input" },
+  { type: "email", label: "Email Input" },
+  { type: "date", label: "Date Input" },
+  { type: "time", label: "Time Input" },
+  { type: "file", label: "File Upload" },
+  { type: "select", label: "Select Dropdown" },
+  { type: "checkbox", label: "Checkbox Group" },
+  { type: "radio", label: "Radio Group" },
+  { type: "acceptance", label: "Acceptance" },
 ];
 
-const DraggableField = ({ fieldData }) => {
+const DraggableField = ({ fieldType }) => {
   const { drag, isDragging } = usePaletteDrag(
-    fieldData.type,
-    fieldData.label,
-    fieldData.default
+    "PALETTE_FIELD", 
+    fieldType.label,
+    createNewField(fieldType.type, fieldType.label) 
   );
 
   return (
@@ -116,7 +79,7 @@ const DraggableField = ({ fieldData }) => {
         isDragging ? "opacity-50 border-blue-500 shadow-lg" : ""
       }`}
     >
-      {fieldData.label}
+      {fieldType.label}
     </div>
   );
 };
@@ -129,7 +92,7 @@ const LeftSidebar = () => {
       </h3>
       <div className="space-y-3">
         {fieldTypes.map((field, index) => (
-          <DraggableField key={index} fieldData={field} />
+          <DraggableField key={index} fieldType={field} />
         ))}
       </div>
     </div>

@@ -30,12 +30,9 @@ export const useFieldDragAndDrop = (field, index, reorderFields) => {
       }
 
       const hoverBoundingRect = ref.current?.getBoundingClientRect();
-
       const hoverMiddleY =
         (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-
       const clientOffset = monitor.getClientOffset();
-
       const hoverClientY = clientOffset.y - hoverBoundingRect.top;
 
       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {

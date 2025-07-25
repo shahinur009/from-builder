@@ -7,28 +7,48 @@ import { useFieldDragAndDrop } from "@/app/hooks/useDragAndDrop";
 
 const FormField = ({ field, index }) => {
   const {
-    previewMode,
     setSelectedField,
     deleteField,
     duplicateField,
     reorderFields,
+    updateField,
+    selectedField,
   } = useForm();
   const [isHovered, setIsHovered] = useState(false);
 
-  // Use the drag and drop hook re-Ordering
   const { ref, isDragging } = useFieldDragAndDrop(field, index, reorderFields);
 
-  // Different input types
+  const isCurrentlySelected = selectedField && selectedField.id === field.id;
+
+  const handleChange = (e) => {
+    const { name, value, type, checked, files } = e.target;
+    let newValue;
+
+    if (type === "checkbox") {
+      const currentValues = new Set(field.value || []);
+      if (checked) {
+        currentValues.add(value);
+      } else {
+        currentValues.delete(value);
+      }
+      newValue = Array.from(currentValues);
+    } else if (type === "file") {
+      newValue = files[0];
+    } else {
+      newValue = value;
+    }
+
+    updateField(field.id, { value: newValue });
+  };
+
   const renderInput = () => {
     const commonProps = {
       id: field.id,
       name: field.name,
       placeholder: field.placeholder,
       required: field.required,
-      disabled: previewMode,
-      className: `p-2 border rounded w-full ${
-        previewMode ? "bg-gray-100 cursor-not-allowed" : "bg-white"
-      }`,
+      className: `p-2 border rounded w-full bg-white`,
+      onChange: handleChange,
     };
 
     switch (field.type) {
@@ -36,12 +56,14 @@ const FormField = ({ field, index }) => {
       case "email":
       case "date":
       case "time":
-        return <input type={field.type} {...commonProps} />;
+        return (
+          <input type={field.type} value={field.value || ""} {...commonProps} />
+        );
       case "file":
-        return <input type="file" {...commonProps} />;
+        return <input type="file" {...commonProps} value={undefined} />;
       case "select":
         return (
-          <select {...commonProps}>
+          <select value={field.value || ""} {...commonProps}>
             {field.options &&
               field.options.map((option, idx) => {
                 const [label, value] = option.split("=");
@@ -59,6 +81,8 @@ const FormField = ({ field, index }) => {
             {field.options &&
               field.options.map((option, idx) => {
                 const [label, value] = option.split("=");
+                const isChecked =
+                  Array.isArray(field.value) && field.value.includes(value);
                 return (
                   <label
                     key={idx}
@@ -68,7 +92,8 @@ const FormField = ({ field, index }) => {
                       type="checkbox"
                       value={value}
                       name={field.name}
-                      {...commonProps}
+                      checked={isChecked}
+                      onChange={handleChange}
                       className="mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded"
                     />
                     <span className="text-gray-900">{label}</span>
@@ -83,6 +108,7 @@ const FormField = ({ field, index }) => {
             {field.options &&
               field.options.map((option, idx) => {
                 const [label, value] = option.split("=");
+                const isChecked = field.value === value;
                 return (
                   <label
                     key={idx}
@@ -92,7 +118,8 @@ const FormField = ({ field, index }) => {
                       type="radio"
                       value={value}
                       name={field.name}
-                      {...commonProps}
+                      checked={isChecked}
+                      onChange={handleChange}
                       className="mr-2 h-4 w-4 text-blue-600 border-gray-300"
                     />
                     <span className="text-gray-900">{label}</span>
@@ -106,7 +133,9 @@ const FormField = ({ field, index }) => {
           <label className="inline-flex items-center cursor-pointer">
             <input
               type="checkbox"
-              {...commonProps}
+              name={field.name}
+              checked={field.value || false}
+              onChange={handleChange}
               className="mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded"
             />
             <span
@@ -128,10 +157,12 @@ const FormField = ({ field, index }) => {
         opacity: isDragging ? 0.5 : 1,
       }}
       className={`relative p-4 border border-dashed rounded transition-all duration-100 ease-in-out ${
-        isHovered && !previewMode
+        isCurrentlySelected
+          ? "border-purple-500 bg-purple-100"
+          : isHovered
           ? "border-blue-500 bg-blue-50"
           : "border-gray-300 bg-white"
-      } ${previewMode ? "pointer-events-none" : ""}`}
+      } group`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -144,7 +175,7 @@ const FormField = ({ field, index }) => {
       </label>
       {renderInput()}
 
-      {isHovered && !previewMode && (
+      {isHovered && (
         <div className="absolute top-0 right-0 p-1 bg-white border border-t-0 border-r-0 rounded-bl-lg flex space-x-1 shadow-md">
           <button
             onClick={() => setSelectedField(field)}
