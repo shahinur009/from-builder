@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Project Overview
 
-## Getting Started
+This project is a dynamic form builder application that empowers users to visually create, reorder, edit, and preview customizable forms without writing any code. The form structure is driven by a flexible JSON schema, supporting various input types and field properties. It features intuitive drag-and-drop interactions for adding and reordering fields, inline element actions, and a dedicated settings sidebar for granular control over each form element.
 
-First, run the development server:
+## For Source Code
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. clone the github command
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# git clone https://github.com/shahinur009/from-builder.git
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+# open with vs code = code .
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# npm install / npm i
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# npm run dev
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+visit form builder domain:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# https://from-builder-delta.vercel.app/
+
+## Feature:
+# Renders forms dynamically based on a provided JSON schema.
+
+# Input types: text, email, date, time, file, select, checkbox, radio, and acceptance.
+
+# Field properties: label, name, placeholder, required, columnWidth, and options.
+# When hovering over any form field in the builder canvas, three action buttons appear: edit, setting, duplicate
+# Right side show setting
+# Left side show input field and drag and drop options
+# All data save in the localStorage
+# Preview Button
+# Save data to local storage with clicking save button
+
+## Technologist
+# Next.js
+# React.js
+# react.dnd
+# tailwind css
+# React DOM
+
+## Folder Structure:
+# app-> layout.jsx, page.jsx, global.css. 
+## All in the app folder--------------
+# (components) -> _client_providers.jsx, MainAppContent.jsx.
+# common-> Button.jsx, Input.jsx, Select.jsx.
+# FormBuilder -> FromBuilder.jsx, FormField.jsx.
+# Sidebars -> LeftSidebar.jsx, RightSidebar.jsx.
+# context -> FormContext.js.
+# hooks -> useDragAndDrop.js.
+# preview -> page.jsx, RenderForm.jsx.
+# submitted_data -> page.jsx.
+# utils -> initialSchema.js.
+
+
