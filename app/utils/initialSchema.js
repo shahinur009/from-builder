@@ -71,6 +71,7 @@ export const initialSchema = {
       label: "Upload",
       name: "uploadFile",
       columnWidth: "100%",
+      accept: "image/*",
     },
     {
       id: "7azo7fj6",

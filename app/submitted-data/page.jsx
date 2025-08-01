@@ -1,11 +1,10 @@
-// app/submitted-data/page.jsx
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Button from "../(components)/Common/Button"; // Adjust path if necessary
+import Button from "../(components)/Common/Button";
 import { useForm } from "../context/FormContext";
-import Image from "next/image"; // Import Image for displaying submitted images
+import Image from "next/image";
 
 export default function SubmittedDataPage() {
   const { submittedData, showSuccessMessage, setShowSuccessMessage } =
@@ -17,27 +16,17 @@ export default function SubmittedDataPage() {
     if (submittedData) {
       setDisplayData(submittedData);
     }
-    // No timer for success message here, it's handled by SweetAlert.
-    // The setShowSuccessMessage(false) might not be needed here anymore
-    // as the SweetAlert handles the ephemeral nature of the success message.
-    // However, if you plan to show a success message *on this page*, keep it.
-    // For now, I'll remove the timer here as SweetAlert is the primary success indicator.
-    // const timer = setTimeout(() => {
-    //   setShowSuccessMessage(false);
-    // }, 5000);
-    // return () => clearTimeout(timer);
-  }, [submittedData]); // Removed setShowSuccessMessage from dependencies as it's not used directly here for a timer
+  }, [submittedData]);
 
   const handleBackToBuilder = () => {
     router.push("/");
-    setShowSuccessMessage(false); // Reset success message state when going back
+    setShowSuccessMessage(false);
   };
 
   const renderValue = (value) => {
     if (value === null || value === undefined || value === "") {
       return <span className="text-gray-400 italic">N/A</span>;
     }
-    // Check if the value is a file object with previewUrl
     if (
       typeof value === "object" &&
       value &&
@@ -58,7 +47,7 @@ export default function SubmittedDataPage() {
               />
             </div>
           ) : (
-            <span className="text-blue-500 mr-2 text-xl">📄</span> // Generic file icon
+            <span className="text-blue-500 mr-2 text-xl">📄</span>
           )}
           <div className="flex flex-col">
             <span className="font-medium text-gray-800">{value.name}</span>
@@ -83,7 +72,6 @@ export default function SubmittedDataPage() {
         <span className="text-gray-400 italic">No selection</span>
       );
     }
-    // Handle boolean values
     if (typeof value === "boolean") {
       return value ? (
         <span className="text-green-600 font-semibold">Yes</span>

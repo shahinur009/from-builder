@@ -67,7 +67,6 @@ const RightSidebar = () => {
       .split("\n")
       .filter((line) => line.trim() !== "");
 
-    // Immediately update the global form schema
     if (selectedField) {
       updateField(selectedField.id, { options: newOptions });
     }
@@ -77,7 +76,7 @@ const RightSidebar = () => {
     const newContentInput = e.target.value;
     setContentInput(newContentInput);
 
-    // Immediately update the global form schema
+    // update global form schema
     if (selectedField) {
       updateField(selectedField.id, { content: newContentInput });
     }

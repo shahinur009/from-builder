@@ -1,8 +1,7 @@
-// app/(components)/RenderForm/RenderForm.js
-"use client"; // Important for client-side functionality
+"use client";
 
 import React from "react";
-import Image from "next/image"; // Import Image component for optimized images
+import Image from "next/image";
 
 const RenderForm = ({ fields, formData, handleChange }) => {
   const renderInput = (field) => {
@@ -11,9 +10,9 @@ const RenderForm = ({ fields, formData, handleChange }) => {
       name: field.name,
       placeholder: field.placeholder,
       required: field.required,
-      className: `p-3 border border-gray-300 rounded-lg shadow-sm w-full focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out`,
+      className:
+        "p-3 border border-gray-300 rounded-lg shadow-sm w-full focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out",
       onChange: handleChange,
-      // In preview mode, allow interaction, so no `readOnly` or `disabled` here
     };
 
     switch (field.type) {
@@ -24,7 +23,6 @@ const RenderForm = ({ fields, formData, handleChange }) => {
         return (
           <input
             type={field.type}
-            // Use formData value if available, otherwise fall back to field.value from schema
             value={
               formData[field.name] !== undefined
                 ? formData[field.name]
@@ -44,7 +42,8 @@ const RenderForm = ({ fields, formData, handleChange }) => {
             <input
               type="file"
               {...commonProps}
-              value={undefined} // File inputs are uncontrolled and don't use 'value' prop
+              value={undefined}
+              accept={field.accept || undefined}
             />
             {previewUrl && (
               <div className="flex items-center gap-3 p-2 border border-gray-200 rounded-md bg-gray-50 w-full max-w-sm">
@@ -53,8 +52,8 @@ const RenderForm = ({ fields, formData, handleChange }) => {
                     <Image
                       src={previewUrl}
                       alt="Uploaded Image Preview"
-                      layout="fill"
-                      objectFit="cover"
+                      fill
+                      style={{ objectFit: "cover" }}
                       className="rounded"
                     />
                   </div>
@@ -64,13 +63,12 @@ const RenderForm = ({ fields, formData, handleChange }) => {
                     {fileName || "Selected File"}
                   </div>
                 )}
-                {fileName &&
-                  !isImage && ( // Show filename separately if it's not an image preview
-                    <span className="text-sm text-gray-600">{fileName}</span>
-                  )}
+                {!isImage && fileName && (
+                  <span className="text-sm text-gray-600">{fileName}</span>
+                )}
               </div>
             )}
-            {!previewUrl && ( // Display a message if no file is chosen
+            {!previewUrl && (
               <p className="text-gray-500 text-sm italic mt-1">
                 No file chosen
               </p>
@@ -105,14 +103,14 @@ const RenderForm = ({ fields, formData, handleChange }) => {
               field.options.map((option, idx) => {
                 const [label, value] = option.split("=");
                 const currentFormValue =
-                  formData[field.name] || field.value || []; // Ensure it's an array
+                  formData[field.name] || field.value || [];
                 const isChecked =
                   Array.isArray(currentFormValue) &&
                   currentFormValue.includes(value);
                 return (
                   <label
                     key={idx}
-                    className={`inline-flex items-center cursor-pointer text-gray-900`}
+                    className="inline-flex items-center cursor-pointer text-gray-900"
                   >
                     <input
                       type="checkbox"
@@ -139,7 +137,7 @@ const RenderForm = ({ fields, formData, handleChange }) => {
                 return (
                   <label
                     key={idx}
-                    className={`inline-flex items-center cursor-pointer text-gray-900`}
+                    className="inline-flex items-center cursor-pointer text-gray-900"
                   >
                     <input
                       type="radio"
@@ -173,13 +171,7 @@ const RenderForm = ({ fields, formData, handleChange }) => {
           </label>
         );
       default:
-        // This will help you debug if new types are added from the palette
-        console.error(
-          "Unknown field type encountered:",
-          field.type,
-          "for field:",
-          field
-        );
+        console.error("Unknown field type:", field.type, field);
         return (
           <p className="text-red-500 font-medium">
             Unknown field type: <span className="font-bold">{field.type}</span>
@@ -189,7 +181,7 @@ const RenderForm = ({ fields, formData, handleChange }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-x-8 gap-y-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
       {fields.map((field) => (
         <div key={field.id} className="flex flex-col gap-1">
           <label

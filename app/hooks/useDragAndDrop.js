@@ -65,8 +65,8 @@ export const useFieldDragAndDrop = (field, index, reorderFields) => {
 
 export const usePaletteDrag = (type, label, defaultProps) => {
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: type, // This 'type' already comes as "PALETTE_FIELD" from DraggableField
-    item: { label, defaultProps }, // Removed 'type' from here as it's already the drag type
+    type: type,
+    item: { label, defaultProps },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),

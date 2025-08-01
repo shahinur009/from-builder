@@ -1,11 +1,48 @@
-// app/context/FormContext.js
-// (No changes needed, keeping for completeness to show where `successMessage` comes from)
 "use client";
 
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { initialSchema } from "../utils/initialSchema";
 
 const FormContext = createContext();
+
+const standardizeFieldType = (typeString) => {
+  if (!typeString) return "unknown";
+  const lowerCaseType = typeString.toLowerCase().trim();
+  switch (lowerCaseType) {
+    case "text input":
+    case "text":
+      return "text";
+    case "email input":
+    case "email":
+      return "email";
+    case "date input":
+    case "date":
+      return "date";
+    case "time input":
+    case "time":
+      return "time";
+    case "file upload":
+    case "file":
+      return "file";
+    case "select dropdown":
+    case "select":
+      return "select";
+    case "radio input":
+    case "radio":
+      return "radio";
+    case "checkbox input":
+    case "checkbox":
+      return "checkbox";
+    case "acceptance":
+      return "acceptance";
+
+    default:
+      console.warn(
+        `অজানা ফিল্ড টাইপের স্ট্যান্ডার্ডাইজেশন: ${typeString}. যেমন আছে তেমনই ব্যবহার করা হচ্ছে।`
+      );
+      return lowerCaseType;
+  }
+};
 
 export const FormProvider = ({ children }) => {
   const [formSchema, setFormSchema] = useState(initialSchema);
@@ -42,9 +79,22 @@ export const FormProvider = ({ children }) => {
   };
 
   const addField = (newField) => {
+    console.log("Adding new field:", newField);
+    const standardizedNewField = {
+      ...newField,
+      type: standardizeFieldType(newField.type),
+      id: `field-${Date.now()}`,
+      value:
+        newField.type === "checkbox"
+          ? []
+          : newField.type === "file"
+          ? null
+          : newField.value || "",
+    };
+
     setFormSchema((prevSchema) => ({
       ...prevSchema,
-      fields: [...prevSchema.fields, newField],
+      fields: [...prevSchema.fields, standardizedNewField],
     }));
   };
 
@@ -64,7 +114,7 @@ export const FormProvider = ({ children }) => {
         const duplicatedField = {
           ...fieldToDuplicate,
           id: `field-${Date.now()}`,
-          // Also reset value for duplicated field if it's a file to avoid issues
+          // ডুপ্লিকেট করা ফিল্ডের জন্য ফাইল ভ্যালু রিসেট করুন
           value:
             fieldToDuplicate.type === "file" ? null : fieldToDuplicate.value,
         };
@@ -94,7 +144,7 @@ export const FormProvider = ({ children }) => {
         selectedField,
         setSelectedField,
         updateField,
-        addField,
+        addField, // এই ফাংশনটি এখন নতুন স্ট্যান্ডার্ডাইজড টাইপ পাবে
         deleteField,
         duplicateField,
         reorderFields,

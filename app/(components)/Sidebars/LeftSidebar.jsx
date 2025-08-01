@@ -1,14 +1,16 @@
 "use client";
 
 import React from "react";
-import { usePaletteDrag } from "@/app/hooks/useDragAndDrop"; 
+import { usePaletteDrag } from "@/app/hooks/useDragAndDrop";
 
 const createNewField = (type, label) => {
   const timestamp = Date.now();
+  const standardizedType = type.toLowerCase();
   let defaultProps = {
-    id: `${type}-${timestamp}`,
+    id: `${standardizedType}-${timestamp}`,
+    type: standardizedType,
     label: label,
-    name: `${type}${timestamp}`, 
+    name: `${standardizedType}${timestamp}`,
     columnWidth: "100%",
     required: false,
   };
@@ -24,30 +26,30 @@ const createNewField = (type, label) => {
     case "file":
       defaultProps.label = "File Upload";
       defaultProps.name = `fileUpload${timestamp}`;
-      delete defaultProps.placeholder; 
+      delete defaultProps.placeholder;
       break;
     case "select":
       defaultProps.placeholder = "Select an option";
       defaultProps.options = ["Option 1=option1", "Option 2=option2"];
-      defaultProps.value = "option1"; 
+      defaultProps.value = "option1";
       break;
     case "checkbox":
       defaultProps.options = ["Option 1=option1", "Option 2=option2"];
-      defaultProps.value = []; 
+      defaultProps.value = [];
       break;
     case "radio":
       defaultProps.options = ["Option 1=option1", "Option 2=option2"];
-      defaultProps.value = "option1"; 
+      defaultProps.value = "option1";
       break;
     case "acceptance":
       defaultProps.content =
         "<p>I agree to the <strong>terms and conditions</strong>.</p>";
       defaultProps.required = true;
       delete defaultProps.placeholder;
-      defaultProps.value = false; 
+      defaultProps.value = false;
       break;
     default:
-      defaultProps.value = ""; 
+      defaultProps.value = "";
       break;
   }
   return defaultProps;
@@ -67,9 +69,9 @@ const fieldTypes = [
 
 const DraggableField = ({ fieldType }) => {
   const { drag, isDragging } = usePaletteDrag(
-    "PALETTE_FIELD", 
+    "PALETTE_FIELD",
     fieldType.label,
-    createNewField(fieldType.type, fieldType.label) 
+    createNewField(fieldType.type, fieldType.label)
   );
 
   return (

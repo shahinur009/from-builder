@@ -19,10 +19,7 @@ export default function PreviewPage() {
 
   useEffect(() => {
     setPreviewMode(true);
-    // Initialize formData with current field values from formSchema
     const initialData = formSchema.fields.reduce((acc, field) => {
-      // For file types, if there's a stored value (e.g., Data URL), use it.
-      // Otherwise, keep it undefined or null.
       acc[field.name] = field.type === "file" ? field.value : field.value || "";
       return acc;
     }, {});
@@ -48,14 +45,13 @@ export default function PreviewPage() {
     } else if (type === "file") {
       const file = files[0];
       if (file) {
-        // Create a Data URL for immediate preview
         const reader = new FileReader();
         reader.onloadend = () => {
           setFormData((prev) => ({
             ...prev,
             [name]: {
-              file: file, // Store the actual file object
-              previewUrl: reader.result, // Store the Data URL for preview
+              file: file,
+              previewUrl: reader.result,
               name: file.name,
               size: file.size,
               type: file.type,
@@ -63,9 +59,9 @@ export default function PreviewPage() {
           }));
         };
         reader.readAsDataURL(file);
-        return; // Exit early as state update is asynchronous
+        return;
       } else {
-        newValue = null; // Clear if no file selected
+        newValue = null;
       }
     } else {
       newValue = value;
@@ -75,19 +71,18 @@ export default function PreviewPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmittedData(formData); // Store the submitted data in context
+    setSubmittedData(formData);
 
-    // Show SweetAlert success message
     await Swal.fire({
       icon: "success",
       title: "Form Submitted Successfully!",
       text: formSchema.successMessage || "Your form has been submitted.",
       showConfirmButton: false,
-      timer: 2000, // Close after 2 seconds
+      timer: 2000,
     });
 
-    setShowSuccessMessage(true); // Indicate success for SubmittedDataPage
-    router.push("/submitted-data"); // Navigate to submitted data page
+    setShowSuccessMessage(true);
+    router.push("/submitted-data");
   };
 
   return (
