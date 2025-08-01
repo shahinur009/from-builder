@@ -15,14 +15,16 @@ export default function SubmittedDataPage() {
   useEffect(() => {
     if (submittedData) {
       const processedData = { ...submittedData };
+
+      // Process each field to handle file objects
       Object.keys(processedData).forEach((key) => {
         const value = processedData[key];
         if (value instanceof File) {
           processedData[key] = {
             file: value,
             name: value.name,
-            // size: value.size,
-            // type: value.type,
+            size: value.size,
+            type: value.type,
             previewUrl: URL.createObjectURL(value),
           };
         }
@@ -31,7 +33,7 @@ export default function SubmittedDataPage() {
       setDisplayData(processedData);
     }
 
-    // Clean up object URLs
+    // Clean up object URLs when component unmounts
     return () => {
       if (displayData) {
         Object.values(displayData).forEach((value) => {
@@ -53,7 +55,7 @@ export default function SubmittedDataPage() {
       return <span className="text-gray-400 italic">N/A</span>;
     }
 
-    // File objects directly
+    // Handle File objects directly
     if (value instanceof File) {
       const isImage = value.type.startsWith("image/");
       const previewUrl = URL.createObjectURL(value);
@@ -81,7 +83,7 @@ export default function SubmittedDataPage() {
       );
     }
 
-    // Handle processed file objects
+    // Handle processed file objects (with previewUrl)
     if (
       typeof value === "object" &&
       value !== null &&
