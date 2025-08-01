@@ -45,27 +45,20 @@ export default function PreviewPage() {
     } else if (type === "file") {
       const file = files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setFormData((prev) => ({
-            ...prev,
-            [name]: {
-              file: file,
-              previewUrl: reader.result,
-              name: file.name,
-              size: file.size,
-              type: file.type,
-            },
-          }));
+        newValue = {
+          file: file,
+          previewUrl: URL.createObjectURL(file),
+          name: file.name,
+          size: file.size,
+          type: file.type,
         };
-        reader.readAsDataURL(file);
-        return;
       } else {
         newValue = null;
       }
     } else {
       newValue = value;
     }
+
     setFormData((prev) => ({ ...prev, [name]: newValue }));
   };
 
@@ -98,7 +91,7 @@ export default function PreviewPage() {
           onClick={() => router.push("/")}
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-xl shadow-md transition-all duration-300 ease-in-out transform hover:scale-105"
         >
-          Back to Builder
+          Back to F.Builder
         </Button>
       </nav>
 
@@ -110,13 +103,14 @@ export default function PreviewPage() {
           fields={formSchema.fields}
           formData={formData}
           handleChange={handleChange}
+          disabled={true}
         />
         <div className="mt-8 text-center">
           <Button
             type="submit"
             className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-10 rounded-xl shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300"
           >
-            Submit Form
+            Submit
           </Button>
         </div>
       </form>

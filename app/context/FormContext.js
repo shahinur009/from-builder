@@ -37,9 +37,7 @@ const standardizeFieldType = (typeString) => {
       return "acceptance";
 
     default:
-      console.warn(
-        `অজানা ফিল্ড টাইপের স্ট্যান্ডার্ডাইজেশন: ${typeString}. যেমন আছে তেমনই ব্যবহার করা হচ্ছে।`
-      );
+      console.warn(`Unknown type: ${typeString}.`);
       return lowerCaseType;
   }
 };
@@ -85,10 +83,10 @@ export const FormProvider = ({ children }) => {
       type: standardizeFieldType(newField.type),
       id: `field-${Date.now()}`,
       value:
-        newField.type === "checkbox"
-          ? []
-          : newField.type === "file"
+        newField.type === "file"
           ? null
+          : newField.type === "checkbox"
+          ? []
           : newField.value || "",
     };
 
@@ -114,7 +112,6 @@ export const FormProvider = ({ children }) => {
         const duplicatedField = {
           ...fieldToDuplicate,
           id: `field-${Date.now()}`,
-          // ডুপ্লিকেট করা ফিল্ডের জন্য ফাইল ভ্যালু রিসেট করুন
           value:
             fieldToDuplicate.type === "file" ? null : fieldToDuplicate.value,
         };
@@ -144,7 +141,7 @@ export const FormProvider = ({ children }) => {
         selectedField,
         setSelectedField,
         updateField,
-        addField, // এই ফাংশনটি এখন নতুন স্ট্যান্ডার্ডাইজড টাইপ পাবে
+        addField,
         deleteField,
         duplicateField,
         reorderFields,

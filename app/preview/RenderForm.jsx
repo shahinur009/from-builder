@@ -13,6 +13,8 @@ const RenderForm = ({ fields, formData, handleChange }) => {
       className:
         "p-3 border border-gray-300 rounded-lg shadow-sm w-full focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out",
       onChange: handleChange,
+      disabled: true,
+      readOnly: true,
     };
 
     switch (field.type) {
@@ -31,11 +33,18 @@ const RenderForm = ({ fields, formData, handleChange }) => {
             {...commonProps}
           />
         );
+
       case "file":
         const fileInfo = formData[field.name];
-        const previewUrl = fileInfo?.previewUrl;
-        const fileName = fileInfo?.name;
-        const isImage = previewUrl && fileInfo?.type.startsWith("image/");
+        const previewUrl =
+          fileInfo?.previewUrl ||
+          (fileInfo instanceof File ? URL.createObjectURL(fileInfo) : null);
+        const fileName =
+          fileInfo?.name || (fileInfo instanceof File ? fileInfo.name : null);
+        const isImage =
+          previewUrl &&
+          (fileInfo?.type?.startsWith("image/") ||
+            (fileInfo instanceof File && fileInfo.type.startsWith("image/")));
 
         return (
           <div className="flex flex-col items-start gap-3 w-full">
@@ -44,22 +53,21 @@ const RenderForm = ({ fields, formData, handleChange }) => {
               {...commonProps}
               value={undefined}
               accept={field.accept || undefined}
+              disabled
             />
             {previewUrl && (
               <div className="flex items-center gap-3 p-2 border border-gray-200 rounded-md bg-gray-50 w-full max-w-sm">
                 {isImage ? (
                   <div className="w-[120px] h-[120px] relative flex-shrink-0 border border-gray-300 rounded overflow-hidden shadow-sm">
-                    <Image
+                    <img
                       src={previewUrl}
                       alt="Uploaded Image Preview"
-                      fill
-                      style={{ objectFit: "cover" }}
-                      className="rounded"
+                      className="w-full h-full object-cover rounded"
                     />
                   </div>
                 ) : (
                   <div className="flex items-center text-gray-700 text-sm">
-                    <span className="mr-2 text-blue-500 text-xl">📄</span>{" "}
+                    <span className="mr-2 text-blue-500 text-xl">📄</span>
                     {fileName || "Selected File"}
                   </div>
                 )}
@@ -75,6 +83,7 @@ const RenderForm = ({ fields, formData, handleChange }) => {
             )}
           </div>
         );
+
       case "select":
         return (
           <select
@@ -96,6 +105,7 @@ const RenderForm = ({ fields, formData, handleChange }) => {
               })}
           </select>
         );
+
       case "checkbox":
         return (
           <div className="flex flex-col space-y-2">
@@ -117,7 +127,7 @@ const RenderForm = ({ fields, formData, handleChange }) => {
                       value={value}
                       name={field.name}
                       checked={isChecked}
-                      onChange={handleChange}
+                      disabled
                       className="mr-2 h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                     <span>{label}</span>
@@ -126,6 +136,7 @@ const RenderForm = ({ fields, formData, handleChange }) => {
               })}
           </div>
         );
+
       case "radio":
         return (
           <div className="flex flex-col space-y-2">
@@ -144,7 +155,7 @@ const RenderForm = ({ fields, formData, handleChange }) => {
                       value={value}
                       name={field.name}
                       checked={isChecked}
-                      onChange={handleChange}
+                      disabled
                       className="mr-2 h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
                     />
                     <span>{label}</span>
@@ -153,6 +164,7 @@ const RenderForm = ({ fields, formData, handleChange }) => {
               })}
           </div>
         );
+
       case "acceptance":
         return (
           <label className="inline-flex items-center cursor-pointer text-gray-900">
@@ -164,12 +176,13 @@ const RenderForm = ({ fields, formData, handleChange }) => {
                   ? formData[field.name]
                   : field.value || false
               }
-              onChange={handleChange}
+              disabled
               className="mr-2 h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
             <span dangerouslySetInnerHTML={{ __html: field.content }} />
           </label>
         );
+
       default:
         console.error("Unknown field type:", field.type, field);
         return (

@@ -24,14 +24,12 @@ export default function MainAppContent() {
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       <nav className="bg-white p-4 shadow-md flex justify-between items-center z-10">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Dynamic Form Builder
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-800">Form Builder</h1>
         <Button
           onClick={handlePreviewClick}
           className="bg-purple-600 hover:bg-purple-700 text-white shadow-md rounded-lg transition-all duration-200 ease-in-out"
         >
-          Preview Form
+          Preview
         </Button>
       </nav>
 

@@ -14,8 +14,33 @@ export default function SubmittedDataPage() {
 
   useEffect(() => {
     if (submittedData) {
-      setDisplayData(submittedData);
+      const processedData = { ...submittedData };
+      Object.keys(processedData).forEach((key) => {
+        const value = processedData[key];
+        if (value instanceof File) {
+          processedData[key] = {
+            file: value,
+            name: value.name,
+            // size: value.size,
+            // type: value.type,
+            previewUrl: URL.createObjectURL(value),
+          };
+        }
+      });
+
+      setDisplayData(processedData);
     }
+
+    // Clean up object URLs
+    return () => {
+      if (displayData) {
+        Object.values(displayData).forEach((value) => {
+          if (value && typeof value === "object" && value.previewUrl) {
+            URL.revokeObjectURL(value.previewUrl);
+          }
+        });
+      }
+    };
   }, [submittedData]);
 
   const handleBackToBuilder = () => {
@@ -27,23 +52,20 @@ export default function SubmittedDataPage() {
     if (value === null || value === undefined || value === "") {
       return <span className="text-gray-400 italic">N/A</span>;
     }
-    if (
-      typeof value === "object" &&
-      value &&
-      value.file instanceof File &&
-      value.previewUrl
-    ) {
+
+    // File objects directly
+    if (value instanceof File) {
       const isImage = value.type.startsWith("image/");
+      const previewUrl = URL.createObjectURL(value);
+
       return (
         <div className="flex items-center gap-3">
           {isImage ? (
             <div className="w-[80px] h-[80px] relative border border-gray-200 rounded overflow-hidden shadow-sm flex-shrink-0">
-              <Image
-                src={value.previewUrl}
+              <img
+                src={previewUrl}
                 alt={`Uploaded file: ${value.name}`}
-                layout="fill"
-                objectFit="cover"
-                className="rounded"
+                className="w-full h-full object-cover rounded"
               />
             </div>
           ) : (
@@ -58,6 +80,38 @@ export default function SubmittedDataPage() {
         </div>
       );
     }
+
+    // Handle processed file objects
+    if (
+      typeof value === "object" &&
+      value !== null &&
+      value.file instanceof File
+    ) {
+      const isImage = value.type.startsWith("image/");
+
+      return (
+        <div className="flex items-center gap-3">
+          {isImage && value.previewUrl ? (
+            <div className="w-[80px] h-[80px] relative border border-gray-200 rounded overflow-hidden shadow-sm flex-shrink-0">
+              <img
+                src={value.previewUrl}
+                alt={`Uploaded file: ${value.name}`}
+                className="w-full h-full object-cover rounded"
+              />
+            </div>
+          ) : (
+            <span className="text-blue-500 mr-2 text-xl">📄</span>
+          )}
+          <div className="flex flex-col">
+            <span className="font-medium text-gray-800">{value.name}</span>
+            <span className="text-sm text-gray-500">
+              ({(value.size / 1024).toFixed(2)} KB, Type: {value.type})
+            </span>
+          </div>
+        </div>
+      );
+    }
+
     if (Array.isArray(value)) {
       return value.length > 0 ? (
         value.map((item, idx) => (
@@ -72,6 +126,7 @@ export default function SubmittedDataPage() {
         <span className="text-gray-400 italic">No selection</span>
       );
     }
+
     if (typeof value === "boolean") {
       return value ? (
         <span className="text-green-600 font-semibold">Yes</span>
@@ -79,6 +134,7 @@ export default function SubmittedDataPage() {
         <span className="text-red-600 font-semibold">No</span>
       );
     }
+
     return String(value);
   };
 

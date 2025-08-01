@@ -33,7 +33,7 @@ const FormField = ({ field, index }) => {
       }
       newValue = Array.from(currentValues);
     } else if (type === "file") {
-      newValue = files[0];
+      newValue = files?.[0] || null; // Optional chaining ব্যবহার করুন
     } else {
       newValue = value;
     }
@@ -60,7 +60,34 @@ const FormField = ({ field, index }) => {
           <input type={field.type} value={field.value || ""} {...commonProps} />
         );
       case "file":
-        return <input type="file" {...commonProps} value={undefined} />;
+        const fileValue = field.value;
+        const isFile = fileValue instanceof File;
+        const isImage = isFile && fileValue.type?.startsWith?.("image/");
+
+        return (
+          <div className="flex flex-col">
+            <input
+              type="file"
+              {...commonProps}
+              onChange={handleChange}
+              value={undefined}
+            />
+            {isFile && (
+              <div className="mt-2">
+                {isImage && (
+                  <img
+                    src={URL.createObjectURL(fileValue)}
+                    alt="Preview"
+                    className="max-w-full h-auto max-h-40 border rounded"
+                  />
+                )}
+                <p className="text-sm text-gray-600 mt-1">
+                  {fileValue.name} ({(fileValue.size / 1024).toFixed(2)} KB)
+                </p>
+              </div>
+            )}
+          </div>
+        );
       case "select":
         return (
           <select value={field.value || ""} {...commonProps}>
