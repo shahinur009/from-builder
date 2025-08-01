@@ -16,7 +16,6 @@ export default function SubmittedDataPage() {
     if (submittedData) {
       const processedData = { ...submittedData };
 
-      // Process each field to handle file objects
       Object.keys(processedData).forEach((key) => {
         const value = processedData[key];
         if (value instanceof File) {
@@ -33,7 +32,6 @@ export default function SubmittedDataPage() {
       setDisplayData(processedData);
     }
 
-    // Clean up object URLs when component unmounts
     return () => {
       if (displayData) {
         Object.values(displayData).forEach((value) => {
@@ -57,7 +55,7 @@ export default function SubmittedDataPage() {
 
     // Handle File objects directly
     if (value instanceof File) {
-      const isImage = value.type.startsWith("image/");
+      const isImage = value?.type?.startsWith("image/");
       const previewUrl = URL.createObjectURL(value);
 
       return (
@@ -83,13 +81,12 @@ export default function SubmittedDataPage() {
       );
     }
 
-    // Handle processed file objects (with previewUrl)
     if (
       typeof value === "object" &&
       value !== null &&
       value.file instanceof File
     ) {
-      const isImage = value.type.startsWith("image/");
+      const isImage = value?.type?.startsWith("image/");
 
       return (
         <div className="flex items-center gap-3">
