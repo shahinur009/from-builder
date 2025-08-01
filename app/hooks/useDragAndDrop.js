@@ -5,7 +5,7 @@ import { useDrag, useDrop } from "react-dnd";
 
 const ItemTypes = {
   CARD: "card",
-  PALETTE_FIELD: "paletteField",
+  PALETTE_FIELD: "PALETTE_FIELD",
 };
 
 export const useFieldDragAndDrop = (field, index, reorderFields) => {
@@ -65,8 +65,8 @@ export const useFieldDragAndDrop = (field, index, reorderFields) => {
 
 export const usePaletteDrag = (type, label, defaultProps) => {
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: ItemTypes.PALETTE_FIELD,
-    item: { type, label, defaultProps },
+    type: type, // This 'type' already comes as "PALETTE_FIELD" from DraggableField
+    item: { label, defaultProps }, // Removed 'type' from here as it's already the drag type
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),

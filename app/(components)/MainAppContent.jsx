@@ -2,11 +2,11 @@
 
 import React from "react";
 import LeftSidebar from "./Sidebars/LeftSidebar";
-import RightSidebar from "./Sidebars/RightSidebar"; 
+import RightSidebar from "./Sidebars/RightSidebar";
 import FormBuilder from "./FormBuilder/FormBuilder";
-import Button from "./Common/Button"; 
+import Button from "./Common/Button";
 import { useForm } from "../context/FormContext";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 
 export default function MainAppContent() {
   const { selectedField, setSelectedField } = useForm();

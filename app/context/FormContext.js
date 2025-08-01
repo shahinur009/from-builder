@@ -1,3 +1,5 @@
+// app/context/FormContext.js
+// (No changes needed, keeping for completeness to show where `successMessage` comes from)
 "use client";
 
 import React, { createContext, useState, useContext, useEffect } from "react";
@@ -62,6 +64,9 @@ export const FormProvider = ({ children }) => {
         const duplicatedField = {
           ...fieldToDuplicate,
           id: `field-${Date.now()}`,
+          // Also reset value for duplicated field if it's a file to avoid issues
+          value:
+            fieldToDuplicate.type === "file" ? null : fieldToDuplicate.value,
         };
         const index = newFields.findIndex((field) => field.id === fieldId);
         newFields.splice(index + 1, 0, duplicatedField);

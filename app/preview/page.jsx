@@ -1,134 +1,130 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useForm } from "../context/FormContext";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import RenderForm from "./RenderForm";
+import { useForm } from "../context/FormContext";
+import Swal from "sweetalert2";
 import Button from "../(components)/Common/Button";
+import RenderForm from "./RenderForm";
 
 export default function PreviewPage() {
-  const { formSchema, setSubmittedData, setShowSuccessMessage } = useForm();
+  const {
+    formSchema,
+    setPreviewMode,
+    setSubmittedData,
+    setShowSuccessMessage,
+  } = useForm();
   const router = useRouter();
   const [formData, setFormData] = useState({});
-  const [formLoadError, setFormLoadError] = useState(false);
 
   useEffect(() => {
-    if (formSchema && formSchema.fields) {
-      const initialData = {};
-      formSchema.fields.forEach((field) => {
-        if (field.type === "checkbox") {
-          initialData[field.name] = [];
-        } else {
-          initialData[field.name] = field.value || "";
-        }
-      });
-      setFormData(initialData);
-      setFormLoadError(false);
-    } else {
-      setFormLoadError(true);
-    }
-  }, [formSchema]);
+    setPreviewMode(true);
+    // Initialize formData with current field values from formSchema
+    const initialData = formSchema.fields.reduce((acc, field) => {
+      // For file types, if there's a stored value (e.g., Data URL), use it.
+      // Otherwise, keep it undefined or null.
+      acc[field.name] = field.type === "file" ? field.value : field.value || "";
+      return acc;
+    }, {});
+    setFormData(initialData);
+
+    return () => {
+      setPreviewMode(false);
+    };
+  }, [formSchema, setPreviewMode]);
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
+    let newValue;
 
     if (type === "checkbox") {
-      setFormData((prevData) => {
-        const currentValues = new Set(prevData[name] || []);
-        if (checked) {
-          currentValues.add(value);
-        } else {
-          currentValues.delete(value);
-        }
-        return { ...prevData, [name]: Array.from(currentValues) };
-      });
+      const currentValues = new Set(formData[name] || []);
+      if (checked) {
+        currentValues.add(value);
+      } else {
+        currentValues.delete(value);
+      }
+      newValue = Array.from(currentValues);
     } else if (type === "file") {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: files[0],
-      }));
+      const file = files[0];
+      if (file) {
+        // Create a Data URL for immediate preview
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFormData((prev) => ({
+            ...prev,
+            [name]: {
+              file: file, // Store the actual file object
+              previewUrl: reader.result, // Store the Data URL for preview
+              name: file.name,
+              size: file.size,
+              type: file.type,
+            },
+          }));
+        };
+        reader.readAsDataURL(file);
+        return; // Exit early as state update is asynchronous
+      } else {
+        newValue = null; // Clear if no file selected
+      }
     } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
+      newValue = value;
     }
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Submitted:", formData);
-    setSubmittedData(formData);
-    setShowSuccessMessage(true);
-    router.push("/submitted-data");
-  };
+    setSubmittedData(formData); // Store the submitted data in context
 
-  const handleBackToBuilder = () => {
-    router.push("/");
-  };
+    // Show SweetAlert success message
+    await Swal.fire({
+      icon: "success",
+      title: "Form Submitted Successfully!",
+      text: formSchema.successMessage || "Your form has been submitted.",
+      showConfirmButton: false,
+      timer: 2000, // Close after 2 seconds
+    });
 
-  if (
-    formLoadError ||
-    !formSchema ||
-    !formSchema.fields ||
-    formSchema.fields.length === 0
-  ) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 text-center">
-        <h1 className="text-2xl font-bold text-red-600 mb-4">
-          Form Not Found / Empty
-        </h1>
-        <p className="text-gray-700 mb-6">
-          No form schema was loaded or the form is empty. Please ensure you have
-          created and saved a form in the builder first.
-        </p>
-        <Button
-          onClick={handleBackToBuilder}
-          className="bg-purple-600 hover:bg-purple-700 text-white shadow-md rounded-lg"
-        >
-          Back to Form Builder
-        </Button>
-      </div>
-    );
-  }
+    setShowSuccessMessage(true); // Indicate success for SubmittedDataPage
+    router.push("/submitted-data"); // Navigate to submitted data page
+  };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      <nav className="bg-white p-4 shadow-md flex justify-between items-center">
-        <h1 className="text-xl font-bold">Form Preview: {formSchema.name}</h1>
-        <div>
-          <Button
-            onClick={handleBackToBuilder}
-            className="bg-purple-600 hover:bg-purple-700 text-white shadow-md rounded-lg"
-          >
-            Back to Builder
-          </Button>
-        </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center p-6 sm:p-8">
+      <nav className="bg-white p-4 sm:p-6 shadow-lg rounded-lg w-full max-w-5xl mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">
+          Preview:{" "}
+          <span className="text-purple-600">
+            {formSchema.name || "Custom Form"}
+          </span>
+        </h1>
+        <Button
+          onClick={() => router.push("/")}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-xl shadow-md transition-all duration-300 ease-in-out transform hover:scale-105"
+        >
+          Back to Builder
+        </Button>
       </nav>
 
-      <main className="flex-1 p-6 overflow-y-auto flex justify-center items-start">
-        <div className="bg-white p-8 rounded-lg shadow-md max-w-2xl w-full">
-          <h2 className="text-2xl font-bold text-center mb-6">
-            {formSchema.name || "Custom Form"}
-          </h2>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <RenderForm
-              fields={formSchema.fields}
-              formData={formData}
-              handleChange={handleChange}
-              
-            />
-            <div className="flex justify-end mt-6">
-              <Button
-                type="submit"
-                className="bg-green-600 hover:bg-green-700 text-white shadow-md rounded-lg"
-              >
-                Submit Form
-              </Button>
-            </div>
-          </form>
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-5xl bg-white p-8 sm:p-10 rounded-xl shadow-2xl border border-gray-200"
+      >
+        <RenderForm
+          fields={formSchema.fields}
+          formData={formData}
+          handleChange={handleChange}
+        />
+        <div className="mt-8 text-center">
+          <Button
+            type="submit"
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-10 rounded-xl shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300"
+          >
+            Submit Form
+          </Button>
         </div>
-      </main>
+      </form>
     </div>
   );
 }
